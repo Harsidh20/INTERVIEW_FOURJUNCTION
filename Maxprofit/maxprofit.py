@@ -1,53 +1,51 @@
 list1 = [0] * 3
-time = [5, 4, 10]
-cost = [1500, 1000, 3000]
-inputTime = int(input("Enter the  time: "))
-king = []  
-ans = []  
-def findMax(ind, currentTime, profit, l):
-    if ind == len(time):
-          
-        if currentTime != 0:
+time_required = [5, 4, 10]
+cost_per_item = [1500, 1000, 3000]
+input_time = int(input("Enter the time: "))
+results = []
+configurations = []
 
-            for i in range(len(cost)):
-                if l[i] != 0:
-                    profit += currentTime * cost[i] *l[i]
-            
-        ans.append(profit)
-        king.append(l.copy())
+def find_max_profit_recursive(index, current_time, current_profit, current_configuration):
+    if index == len(time_required):
+        if current_time != 0:
+            for i in range(len(cost_per_item)):
+                if current_configuration[i] != 0:
+                    current_profit += current_time * cost_per_item[i] * current_configuration[i]
+        
+        results.append(current_profit)
+        configurations.append(current_configuration.copy())
         return
     
-    if currentTime - time[ind] >= 0:
-        if l:
-            for i in range(len(cost)):
-                if l[i] != 0:
-                    profit += time[ind] * cost[i] * l[i]
-        l[ind] += 1
-        findMax(ind, currentTime - time[ind], profit, l)
-        l[ind] -= 1
-        if l:
-            for i in range(len(cost)):
-                if l[i] != 0:
-                    profit -= time[ind] * cost[i] * l[i]
-    findMax(ind+1, currentTime, profit, l)
+    if current_time - time_required[index] >= 0:
+        if current_configuration:
+            for i in range(len(cost_per_item)):
+                if current_configuration[i] != 0:
+                    current_profit += time_required[index] * cost_per_item[i] * current_configuration[i]
+        
+        current_configuration[index] += 1
+        find_max_profit_recursive(index, current_time - time_required[index], current_profit, current_configuration)
+        current_configuration[index] -= 1
+        if current_configuration:
+            for i in range(len(cost_per_item)):
+                if current_configuration[i] != 0:
+                    current_profit -= time_required[index] * cost_per_item[i] * current_configuration[i]
+    find_max_profit_recursive(index + 1, current_time, current_profit, current_configuration)
 
-findMax(0, inputTime, 0, list1) 
-maximum = max(ans)
+find_max_profit_recursive(0, input_time, 0, list1)
 
-maxi = []
-original = []
-for i in range(len(ans)):
-    if ans[i] == maximum:
-        maxi.append(i)
+max_profit = max(results)
+max_profit_configs = []
+for idx, result in enumerate(results):
+    if result == max_profit:
+        max_profit_configs.append(idx)
 
-for i in maxi:  
-    original.append(king[i])
+original_configs = []
+for idx in max_profit_configs:
+    original_configs.append(configurations[idx])
 
-o = [{'T': i[0], 'P': i[1], 'C': i[2]} for i in original]
-print(f'Profit : {maximum}')
-for i in o:
-    print(i)
+formatted_configs = [{'Time': config[0], 'Profit': config[1], 'Cost': config[2]} for config in original_configs]
 
+print(f'Maximum Profit: {max_profit}')
+for config in formatted_configs:
+    print(config)
 
-
-    
